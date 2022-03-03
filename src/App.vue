@@ -1,27 +1,19 @@
 <template>
   <div class="container">
     <global-header :user="currentUser"></global-header>
-    <form>
+    <validate-form @form-submit="onFormSubmit">
       <div class="mb-3">
         <label class="form-label">邮箱</label>
         <validate-input :rules="emailRules" v-model="emailVal" placeholder="请输入邮箱" type="text"></validate-input>
-        {{emailVal}}
-      </div>
-      <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">邮箱</label>
-        <input
-          type="email" class="form-control" id="exampleInputEmail1"
-          v-model="emailRef.val"
-          @blur="validateEmail"
-        >
-        <div v-if="emailRef.error" id="emailHelp" class="form-text">{{emailRef.message}}</div>
       </div>
       <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">密码</label>
         <validate-input type="password" :rules="passwordRules" v-model="passwordVal" placeholder="请输入密码"></validate-input>
       </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+      <template #submit>
+        <span class="btn btn-danger">Submit</span>
+      </template>
+    </validate-form>
   </div>
 </template>
 
@@ -31,6 +23,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { ColumnProps } from './components/ColumnList.vue'
 import GlobalHeader, { UserProps } from './components/GlobalHeader.vue'
 import ValidateInput, { RulesProp } from './components/ValidateInput.vue'
+import ValidateForm from './components/ValidateForm.vue'
 const currentUser: UserProps = {
   isLogin: true,
   name: 'lvxiaobu'
@@ -67,7 +60,8 @@ export default defineComponent({
   components: {
     // ColumnList,
     GlobalHeader,
-    ValidateInput
+    ValidateInput,
+    ValidateForm
   },
   setup () {
     const emailVal = ref('lvxiaobu')
@@ -94,6 +88,9 @@ export default defineComponent({
         emailRef.message = 'should be valid email'
       }
     }
+    const onFormSubmit = (result: boolean) => {
+      console.log(result)
+    }
     return {
       list: testData,
       currentUser,
@@ -102,7 +99,8 @@ export default defineComponent({
       emailRules,
       emailVal,
       passwordRules,
-      passwordVal
+      passwordVal,
+      onFormSubmit
     }
   }
 })
