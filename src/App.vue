@@ -71,8 +71,8 @@ export default defineComponent({
   },
   setup () {
     const inputRef = ref<any>()
-    const emailVal = ref('lvxiaobu')
-    const passwordVal = ref(null)
+    const emailVal = ref('123@qq.com')
+    const passwordVal = ref(123)
     // 邮箱的要求
     const emailRules: RulesProp = [
       { type: 'required', message: '电子邮箱地址不能为空' },
