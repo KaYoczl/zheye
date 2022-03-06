@@ -12,20 +12,25 @@
 <script lang="ts">
 import { defineComponent, onUnmounted } from 'vue'
 import mitt from 'mitt'
+// 定义的是funcArr每一项方法的类型
+type ValidateFunc = () => boolean
 export const emitter = mitt()
 export default defineComponent({
   emits: ['form-submit'],
   setup (props, context) {
+    let funcArr: ValidateFunc[] = []
     const submitForm = () => {
-      context.emit('form-submit', true)
+      const result = funcArr.map(func => func()).every(result => result)
+      context.emit('form-submit', result)
     }
     // 事件的回调函数
-    const callback = (test: any) => {
-      console.log(test)
+    const callback = (func: any) => {
+      funcArr.push(func)
     }
     emitter.on('form-item-created', callback)
     onUnmounted(() => {
       emitter.off('form-item-created', callback)
+      funcArr = []
     })
     return {
       submitForm

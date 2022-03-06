@@ -71,8 +71,8 @@ export default defineComponent({
   },
   setup () {
     const inputRef = ref<any>()
-    const emailVal = ref('123@qq.com')
-    const passwordVal = ref(123)
+    const emailVal = ref('')
+    const passwordVal = ref()
     // 邮箱的要求
     const emailRules: RulesProp = [
       { type: 'required', message: '电子邮箱地址不能为空' },
@@ -82,7 +82,7 @@ export default defineComponent({
       { type: 'required', message: '密码不能为空' }
     ]
     const onFormSubmit = (result: boolean) => {
-      console.log('result', inputRef.value.validateInput())
+      console.log('result', result)
     }
     return {
       list: testData,
