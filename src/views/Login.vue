@@ -21,6 +21,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
@@ -31,9 +32,7 @@ export default defineComponent({
     ValidateForm
   },
   setup () {
-    const inputRef = ref()
-    const emailVal = ref('')
-    const passwordVal = ref()
+    const router = useRouter()
     // 邮箱的要求
     const emailRules: RulesProp = [
       { type: 'required', message: '电子邮箱地址不能为空' },
@@ -44,14 +43,15 @@ export default defineComponent({
     ]
     const onFormSubmit = (result: boolean) => {
       console.log('result', result)
+      if (result) {
+        // push方法参数跟router-link的to属性是完全一样的
+        router.push({ name: 'column', params: { id: 1 } })
+      }
     }
     return {
       emailRules,
-      emailVal,
       passwordRules,
-      passwordVal,
-      onFormSubmit,
-      inputRef
+      onFormSubmit
     }
   }
 })
