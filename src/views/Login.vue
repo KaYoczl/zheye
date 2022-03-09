@@ -5,7 +5,6 @@
         <label class="form-label">邮箱</label>
         <validate-input
           :rules="emailRules"
-          v-model="emailVal"
           placeholder="请输入邮箱"
           type="text"
           ref="inputRef"
@@ -13,18 +12,19 @@
       </div>
       <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">密码</label>
-        <validate-input type="password" :rules="passwordRules" v-model="passwordVal" placeholder="请输入密码"></validate-input>
+        <validate-input type="password" :rules="passwordRules" placeholder="请输入密码"></validate-input>
       </div>
     </validate-form>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import { useRouter } from 'vue-router'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
+import { useStore } from 'vuex'
 export default defineComponent({
   name: 'App',
   components: {
@@ -33,6 +33,7 @@ export default defineComponent({
   },
   setup () {
     const router = useRouter()
+    const store = useStore()
     // 邮箱的要求
     const emailRules: RulesProp = [
       { type: 'required', message: '电子邮箱地址不能为空' },
@@ -42,10 +43,10 @@ export default defineComponent({
       { type: 'required', message: '密码不能为空' }
     ]
     const onFormSubmit = (result: boolean) => {
-      console.log('result', result)
       if (result) {
         // push方法参数跟router-link的to属性是完全一样的
-        router.push({ name: 'column', params: { id: 1 } })
+        router.push('/')
+        store.commit('login')
       }
     }
     return {
