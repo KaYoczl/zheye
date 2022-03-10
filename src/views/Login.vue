@@ -5,6 +5,7 @@
         <label class="form-label">邮箱</label>
         <validate-input
           :rules="emailRules"
+          v-model="emailVal"
           placeholder="请输入邮箱"
           type="text"
           ref="inputRef"
@@ -12,7 +13,7 @@
       </div>
       <div class="mb-3">
         <label for="exampleInputPassword1" class="form-label">密码</label>
-        <validate-input type="password" :rules="passwordRules" placeholder="请输入密码"></validate-input>
+        <validate-input type="password" :rules="passwordRules" v-model="passwordVal" placeholder="请输入密码"></validate-input>
       </div>
     </validate-form>
   </div>
