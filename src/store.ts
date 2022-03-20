@@ -50,6 +50,9 @@ const store = createStore<GlobalDataProps>({
     },
     fetchColumn (state, rawData) {
       state.columns = [rawData.data]
+    },
+    fetchPosts (state, rawData) {
+      state.posts = rawData.data.list
     }
   },
   actions: {
@@ -71,15 +74,12 @@ const store = createStore<GlobalDataProps>({
     }
   },
   getters: {
-    // biggerColumnsLen (state) {
-    //   return state.columns.filter(c => c._id > 2).length
-    // },
-    // getColumnById: (state) => (id: number) => {
-    //   return state.columns.find(c => c._id === id)
-    // },
-    // getPostsByCid: (state) => (cid: number) => {
-    //   return state.posts.filter(post => post.columnId === cid)
-    // }
+    getColumnById: (state) => (id: string) => {
+      return state.columns.find(c => c._id === id)
+    },
+    getPostsByCid: (state) => (cid: string) => {
+      return state.posts.filter(post => post.column === cid)
+    }
   }
 })
 export default store

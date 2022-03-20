@@ -36,8 +36,8 @@ const router = createRouter({
 // to就是我们即将要到达的路由，即将进入的目标，from是正在离开的路由
 // next是一个方法，我们一定要调用该方法来resolve这个钩子，让这个路由继续前进，执行效果依赖next方法的调用参数
 router.beforeEach((to, from, next) => {
-  console.log('to.meta', to.meta)
-  console.log('from', from)
+  // console.log('to.meta', to.meta)
+  // console.log('from', from)
   // 如果不调用next方法或者传入false，路由就会失效
   // next(false)
   // next()
