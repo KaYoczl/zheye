@@ -4,11 +4,11 @@ import store from './store'
 import axios from 'axios'
 import App from './App.vue'
 
-axios.defaults.baseURL = 'http://api.vikingship.xyz/api'
-// axios.interceptors.request.use(config => {
-//   config.params = { ...config.params, icode: 'C6A6C4086133360B' }
-//   return config
-// })
+axios.defaults.baseURL = 'http://apis.imooc.com/api'
+axios.interceptors.request.use(config => {
+  config.params = { ...config.params, icode: 'B83FA1594D8BFE8D' }
+  return config
+})
 axios.get('/columns').then(res => {
   console.log(res)
 })
