@@ -30,7 +30,8 @@ export interface PostProps {
 export interface GlobalDataProps {
   columns: ColumnProps[]
   posts: PostProps[]
-  user: UserProps
+  user: UserProps,
+  loading: boolean
 }
 const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
   const { data } = await axios.get(url)
@@ -40,7 +41,8 @@ const store = createStore<GlobalDataProps>({
   state: {
     columns: [],
     posts: [],
-    user: { isLogin: true, name: 'lvxiaobu', columnId: 1 }
+    user: { isLogin: true, name: 'lvxiaobu', columnId: 1 },
+    loading: false
   },
   mutations: {
     login (state) {
@@ -57,6 +59,9 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPosts (state, rawData) {
       state.posts = rawData.data.list
+    },
+    setLoading (state, status) {
+      state.loading = status
     }
   },
   actions: {
