@@ -42,8 +42,8 @@ export default defineComponent({
 })
 </script>
 <style>
-  .dropdown-menu{
-    display: block;
-    min-width: 6.6rem;
-  }
+.dropdown-menu {
+  display: block;
+  min-width: 6.6rem;
+}
 </style>

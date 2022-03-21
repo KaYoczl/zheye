@@ -44,7 +44,6 @@ export default defineComponent({
   // 如果你不希望组件的根元素继承 attribute，设置 inheritAttrs: false。
   inheritAttrs: false,
   setup (props, context) {
-    console.log(context.attrs)
     const inputRef = reactive({
       val: props.modelValue || '',
       error: false,

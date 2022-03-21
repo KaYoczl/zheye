@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
@@ -33,6 +33,8 @@ export default defineComponent({
     ValidateForm
   },
   setup () {
+    const emailVal = ref('')
+    const passwordVal = ref('')
     const router = useRouter()
     const store = useStore()
     // 邮箱的要求
@@ -45,12 +47,19 @@ export default defineComponent({
     ]
     const onFormSubmit = (result: boolean) => {
       if (result) {
-        // push方法参数跟router-link的to属性是完全一样的
-        router.push('/')
-        store.commit('login')
+        const payload = {
+          email: emailVal.value,
+          password: passwordVal.value
+        }
+        store.dispatch('login', payload).then(data => {
+          console.log(data)
+          router.push('/')
+        })
       }
     }
     return {
+      emailVal,
+      passwordVal,
       emailRules,
       passwordRules,
       onFormSubmit
