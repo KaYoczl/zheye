@@ -1,11 +1,12 @@
 import { Commit, createStore } from 'vuex'
 import axios from 'axios'
 
-interface UserProps {
+export interface UserProps {
   isLogin: boolean
-  name?: string
-  id?: number
-  columnId: number
+  nickName?: string
+  _id?: string
+  column?: string
+  email?: string
 }
 interface ImageProps {
   _id?: string
@@ -45,10 +46,10 @@ const postAndCommit = async (url: string, mutationName: string, commit: Commit, 
 }
 const store = createStore<GlobalDataProps>({
   state: {
-    token: '',
+    token: localStorage.getItem('token') || '',
     columns: [],
     posts: [],
-    user: { isLogin: false, name: 'lvxiaobu', columnId: 1 },
+    user: { isLogin: false },
     loading: false
   },
   mutations: {
@@ -71,7 +72,13 @@ const store = createStore<GlobalDataProps>({
       state.loading = status
     },
     login (state, rawData) {
-      state.token = rawData.data.token
+      const { token } = rawData.data
+      state.token = token
+      localStorage.setItem('token', token)
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`
+    },
+    fetchCurrentUser (state, rawData) {
+      state.user = { isLogin: true, ...rawData.data }
     }
   },
   actions: {
@@ -86,6 +93,14 @@ const store = createStore<GlobalDataProps>({
     },
     login ({ commit }, payload) {
       return postAndCommit('/user/login', 'login', commit, payload)
+    },
+    fetchCurrentUser ({ commit }) {
+      getAndCommit('/user/current', 'fetchCurrentUser', commit)
+    },
+    loginAndFetch ({ dispatch }, loginData) {
+      return dispatch('login', loginData).then(() => {
+        return dispatch('fetchCurrentUser')
+      })
     }
   },
   getters: {
