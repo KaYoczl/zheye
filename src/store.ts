@@ -28,12 +28,17 @@ export interface PostProps {
   createdAt: string
   column: string
 }
+export interface GlobalErrorProps {
+  status: boolean
+  message?: string
+}
 export interface GlobalDataProps {
-  token: string,
+  token: string
   columns: ColumnProps[]
   posts: PostProps[]
-  user: UserProps,
+  user: UserProps
   loading: boolean
+  error: GlobalErrorProps
 }
 const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
   const { data } = await axios.get(url)
@@ -50,7 +55,8 @@ const store = createStore<GlobalDataProps>({
     columns: [],
     posts: [],
     user: { isLogin: false },
-    loading: false
+    loading: false,
+    error: { status: false }
   },
   mutations: {
     // login (state) {
@@ -79,6 +85,9 @@ const store = createStore<GlobalDataProps>({
     },
     fetchCurrentUser (state, rawData) {
       state.user = { isLogin: true, ...rawData.data }
+    },
+    setError (state, e: GlobalErrorProps) {
+      state.error = e
     }
   },
   actions: {

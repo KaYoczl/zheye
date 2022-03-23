@@ -12,7 +12,8 @@
   </teleport>
 </template>
 <script lang="ts">
-import { defineComponent, onUnmounted } from 'vue'
+import { defineComponent } from 'vue'
+import useDOMCreate from '../hooks/useDOMCreate'
 
 export default defineComponent({
   props: {
@@ -25,13 +26,7 @@ export default defineComponent({
     }
   },
   setup () {
-    const node = document.createElement('div')
-    node.id = 'back'
-    document.body.appendChild(node)
-    onUnmounted(() => {
-      // 如果不在组件卸载的时候清除节点，那么每次发请求都会生成一个id为back的div，越来越多
-      document.body.removeChild(node)
-    })
+    useDOMCreate('back')
   }
 })
 </script>
