@@ -19,6 +19,7 @@ axios.interceptors.request.use(config => {
 // 发送请求时提交setLoading改变loading状态
 axios.interceptors.request.use(config => {
   store.commit('setLoading', true)
+  store.commit('setError', { status: false, message: '' })
   return config
 })
 axios.interceptors.response.use(config => {
@@ -27,6 +28,7 @@ axios.interceptors.response.use(config => {
   }, 2000)
   return config
 }, e => {
+  console.log(e.response.data)
   const { error } = e.response.data
   store.commit('setError', { status: true, message: error })
   store.commit('setLoading', false)
