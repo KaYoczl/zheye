@@ -9,17 +9,22 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, PropType } from 'vue'
 import axios from 'axios'
 type UploadStatus = 'ready' | 'loading' | 'success' | 'error'
+type CheckFunction = (file: File) => boolean
 export default defineComponent({
   props: {
     action: {
       type: String,
       required: true
+    },
+    beforeUpload: {
+      type: Function as PropType<CheckFunction>
     }
   },
-  setup (props) {
+  emits: ['file-uploaded', 'file-uploaded-error'],
+  setup (props, context) {
     const fileInput = ref<null | HTMLInputElement>(null)
     const fileStatus = ref<UploadStatus>('ready')
     const triggerUpload = () => {
@@ -32,9 +37,15 @@ export default defineComponent({
       // 为了在currentTarget上拿到files属性
       const currentTarget = e.target as HTMLInputElement
       if (currentTarget.files) {
-        fileStatus.value = 'loading'
         // currentTarget.files是类数组对象，转换成数组
         const files = Array.from(currentTarget.files)
+        if (props.beforeUpload) {
+          const result = props.beforeUpload(files[0])
+          if (!result) {
+            return
+          }
+        }
+        fileStatus.value = 'loading'
         const formData = new FormData()
         // formData.append的key可自定义，value拿数组第一项，因为只能上传一个文件
         formData.append(files[0].name, files[0])
@@ -44,10 +55,11 @@ export default defineComponent({
             'Context-type': 'multipart/form-data'
           }
         }).then(res => {
-          console.log(res.data)
+          context.emit('file-uploaded', res.data)
           fileStatus.value = 'success'
-        }).catch(() => {
+        }).catch((error) => {
           fileStatus.value = 'error'
+          context.emit('file-uploaded-error', { error })
         // 不管是成功还是失败都会触发.finally
         }).finally(() => {
           // 无论成功还是失败，input框的内容都要清空
