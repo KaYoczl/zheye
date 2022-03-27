@@ -1,6 +1,10 @@
 <template>
   <div>
-    <uploader action="/upload" :beforeUpload="beforeUpload" @file-uploaded="onFileUploaded" @file-uploaded-error="fileUploadedError"></uploader>
+    <uploader action="/upload" :beforeUpload="beforeUpload" @file-uploaded="onFileUploaded" @file-uploaded-error="fileUploadedError">
+      <template #uploaded="dataProps">
+        <img :src="dataProps.uploadedData.data.url" width="500">
+      </template>
+    </uploader>
     <column-list :list="list"></column-list>
   </div>
 </template>
