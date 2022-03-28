@@ -5,6 +5,7 @@ import Signup from './views/Signup.vue'
 import ColumnDetail from './views/ColumnDetail.vue'
 import CreatePost from './views/CreatePost.vue'
 import store from './store'
+import axios from 'axios'
 
 const routerHistory = createWebHistory()
 const router = createRouter({
@@ -42,17 +43,37 @@ const router = createRouter({
 // to就是我们即将要到达的路由，即将进入的目标，from是正在离开的路由
 // next是一个方法，我们一定要调用该方法来resolve这个钩子，让这个路由继续前进，执行效果依赖next方法的调用参数
 router.beforeEach((to, from, next) => {
-  // console.log('to.meta', to.meta)
-  // console.log('from', from)
-  // 如果不调用next方法或者传入false，路由就会失效
-  // next(false)
-  // next()
-  if (to.meta.requireLogin && !store.state.user.isLogin) {
-    next({ name: 'login' })
-  } else if (to.meta.redirectAlreadyLogin && store.state.user.isLogin) {
-    next('/')
+  // to.meta能拿到路由元信息
+  const { user, token } = store.state
+  const { requiredLogin, redirectAlreadyLogin } = to.meta
+  if (!user.isLogin) {
+    if (token) {
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`
+      store.dispatch('fetchCurrentUser').then(() => {
+        if (redirectAlreadyLogin) {
+          next('/')
+        } else {
+          next()
+        }
+      }).catch(e => {
+        console.error(e)
+        // 既然获取当前用户失败了但又有token，说明token不好用了，要删掉
+        store.commit('logout')
+        next('login')
+      })
+    } else {
+      if (requiredLogin) {
+        next('login')
+      } else {
+        next()
+      }
+    }
   } else {
-    next()
+    if (redirectAlreadyLogin) {
+      next('/')
+    } else {
+      next()
+    }
   }
 })
 export default router

@@ -18,7 +18,8 @@ import { computed, defineComponent, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import PostList from '../components/PostList.vue'
 import { useStore } from 'vuex'
-import { GlobalDataProps } from '../store'
+import { GlobalDataProps, ColumnProps } from '../store'
+import { generateFitUrl } from '../helper'
 export default defineComponent({
   components: {
     PostList
@@ -31,7 +32,13 @@ export default defineComponent({
       store.dispatch('fetchColumn', currentId)
       store.dispatch('fetchPosts', currentId)
     })
-    const column = computed(() => store.getters.getColumnById(currentId))
+    const column = computed(() => {
+      const selectColumn = store.getters.getColumnById(currentId) as ColumnProps
+      if (selectColumn) {
+        generateFitUrl(selectColumn)
+      }
+      return selectColumn
+    })
     const list = computed(() => store.getters.getPostsByCid(currentId))
     return {
       column,
