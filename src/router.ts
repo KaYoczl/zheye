@@ -4,6 +4,7 @@ import Login from './views/Login.vue'
 import Signup from './views/Signup.vue'
 import ColumnDetail from './views/ColumnDetail.vue'
 import CreatePost from './views/CreatePost.vue'
+import PostDetail from './views/PostDetail.vue'
 import store from './store'
 import axios from 'axios'
 
@@ -37,6 +38,11 @@ const router = createRouter({
       name: 'create',
       component: CreatePost,
       meta: { requireLogin: true }
+    },
+    {
+      path: '/posts/:id',
+      name: 'posts',
+      component: PostDetail
     }
   ]
 })

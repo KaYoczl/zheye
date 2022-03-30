@@ -10,17 +10,20 @@ export interface ResponseErrorType {
   code: number
   error: string
 }
+export interface ImageProps {
+  _id?: string
+  url?: string
+  createAt?: string
+}
 export interface UserProps {
   isLogin: boolean
   nickName?: string
   _id?: string
   column?: string
   email?: string
-}
-export interface ImageProps {
-  _id?: string
-  url?: string
-  createAt?: string
+  description?: string
+  avatar?: ImageProps
+  createdAt?: string
 }
 export interface ColumnProps {
   _id: string;
@@ -36,7 +39,7 @@ export interface PostProps {
   image?: ImageProps | string
   createdAt?: string
   column: string
-  author?: string
+  author?: UserProps | string
 }
 export interface GlobalErrorProps {
   status: boolean
@@ -85,6 +88,9 @@ const store = createStore<GlobalDataProps>({
     fetchPosts (state, rawData) {
       state.posts = rawData.data.list
     },
+    fetchPost (state, rawData) {
+      state.posts = [rawData.data]
+    },
     setLoading (state, status) {
       state.loading = status
     },
@@ -116,6 +122,9 @@ const store = createStore<GlobalDataProps>({
     fetchPosts ({ commit }, cid) {
       return getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
     },
+    fetchPost ({ commit }, pid) {
+      return getAndCommit(`/posts/${pid}`, 'fetchPost', commit)
+    },
     login ({ commit }, payload) {
       return postAndCommit('/user/login', 'login', commit, payload)
     },
@@ -137,6 +146,9 @@ const store = createStore<GlobalDataProps>({
     },
     getPostsByCid: (state) => (cid: string) => {
       return state.posts.filter(post => post.column === cid)
+    },
+    getPostByPid: (state) => (pid: string) => {
+      return state.posts.find(post => post._id === pid)
     }
   }
 })
