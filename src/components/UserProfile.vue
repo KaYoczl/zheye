@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="profile">
-      <img :src="imgUrl" class="img-circle image">
+      <img :src="imgUrl" :alt="author.nickName" class="img-circle image">
       <div class="nickName">{{author.nickName}}</div>
       <div class="description">{{author.description}}</div>
     </div>
@@ -22,7 +22,7 @@ export default defineComponent({
     console.log(props.author)
     const imgUrl = computed(() => {
       const { avatar } = props.author
-      return avatar?.url
+      return avatar && avatar.url
     })
     const time = new Date()
     return {
