@@ -19,7 +19,6 @@ export default defineComponent({
     onMounted(() => {
       store.dispatch('fetchColumns')
     })
-    console.log(store.state.columns)
     const list = computed(() => store.state.columns)
     return {
       list

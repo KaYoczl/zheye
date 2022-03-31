@@ -7,6 +7,10 @@
     <user-profile :author="currentPost.author" v-if="typeof currentPost.author !== 'string'"></user-profile>
     <hr>
     <div class="content" v-html="currentHTML"></div>
+    <div v-if="showEditArea" class="btn-group mt-5">
+      <router-link :to="{name: 'create', query: { id: currentPost._id }}" type="button" class="btn btn-success">编辑</router-link>
+      <button type="button" class="btn btn-danger">删除</button>
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -14,7 +18,7 @@ import { defineComponent, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import MarkdownIt from 'markdown-it'
-import { PostProps, ImageProps } from '../store'
+import { PostProps, ImageProps, UserProps } from '../store'
 import UserProfile from '../components/UserProfile.vue'
 
 export default defineComponent({
@@ -43,10 +47,20 @@ export default defineComponent({
         return null
       }
     })
+    const showEditArea = computed(() => {
+      const { isLogin, _id } = store.state.user
+      if (currentPost.value && currentPost.value.author && isLogin) {
+        const postAuthor = currentPost.value.author as UserProps
+        return postAuthor._id === _id
+      } else {
+        return null
+      }
+    })
     return {
       currentPost,
       currentImageUrl,
-      currentHTML
+      currentHTML,
+      showEditArea
     }
   }
 })

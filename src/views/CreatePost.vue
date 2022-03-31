@@ -1,7 +1,7 @@
 <template>
   <div class="create-post-page">
     <h4>新建文章</h4>
-    <uploader action="/upload" :beforeUpload="beforeUpload" @file-uploaded="handleFileUploaded" @file-uploaded-error="fileUploadedError"
+    <uploader action="/upload" :beforeUpload="beforeUpload" @file-uploaded="handleFileUploaded" @file-uploaded-error="fileUploadedError" :uploaded="uploadedData"
       class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4"
     >
       <h2>点击上传图片</h2>
@@ -41,8 +41,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { defineComponent, ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
 import Uploader from '../components/Uploader.vue'
@@ -58,9 +58,13 @@ export default defineComponent({
     Uploader
   },
   setup () {
+    const uploadedData = ref()
     const titleVal = ref('')
     const contentVal = ref('')
     const router = useRouter()
+    const route = useRoute()
+    const isEditMode = !!route.query.id
+    console.log(isEditMode)
     const store = useStore<GlobalDataProps>()
     let imageId = ''
     const titleRules: RulesProp = [
@@ -69,6 +73,18 @@ export default defineComponent({
     const contentRules: RulesProp = [
       { type: 'required', message: '文章详情不能为空' }
     ]
+    onMounted(() => {
+      if (isEditMode) {
+        store.dispatch('fetchPost', route.query.id).then((rawData: ResponseType<PostProps>) => {
+          const currentPost = rawData.data
+          if (currentPost.image) {
+            uploadedData.value = { data: currentPost.image }
+          }
+          titleVal.value = currentPost.title
+          contentVal.value = currentPost.content || ''
+        })
+      }
+    })
     const handleFileUploaded = (rawData: ResponseType<ImageProps>) => {
       if (rawData.data._id) {
         imageId = rawData.data._id
@@ -111,6 +127,7 @@ export default defineComponent({
       return passed
     }
     return {
+      uploadedData,
       titleRules,
       contentRules,
       titleVal,

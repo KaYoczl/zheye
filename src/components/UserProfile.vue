@@ -19,7 +19,6 @@ export default defineComponent({
     }
   },
   setup (props) {
-    console.log(props.author)
     const imgUrl = computed(() => {
       const { avatar } = props.author
       return avatar && avatar.url
