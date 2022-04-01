@@ -53,17 +53,7 @@ export interface GlobalDataProps {
   loading: boolean
   error: GlobalErrorProps
 }
-const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
-  const { data } = await axios.get(url)
-  commit(mutationName, data)
-  return data
-}
-const postAndCommit = async (url: string, mutationName: string, commit: Commit, payload: any) => {
-  const { data } = await axios.post(url, payload)
-  commit(mutationName, data)
-  return data
-}
-// 第3个参数是传入axios发送请求时的配置，它有一个独特的类型
+// 第4个参数是传入axios发送请求时的配置，它有一个独特的类型
 const asyncAndCommit = async (url: string, mutationName: string, commit: Commit, config: AxiosRequestConfig = { method: 'get' }) => {
   // 不是直接使用get等方法，而是把axios当方法使用，第一个参数是url，第二个是config
   const { data } = await axios(url, config)
@@ -85,6 +75,9 @@ const store = createStore<GlobalDataProps>({
     // },
     createPost (state, newPost) {
       state.posts.push(newPost)
+    },
+    deletePost (state, { data }) {
+      state.posts = state.posts.filter(post => post._id !== data._id)
     },
     fetchColumns (state, rawData) {
       state.columns = rawData.data.list
@@ -131,16 +124,16 @@ const store = createStore<GlobalDataProps>({
   },
   actions: {
     fetchColumns ({ commit }) {
-      return getAndCommit('/columns', 'fetchColumns', commit)
+      return asyncAndCommit('/columns', 'fetchColumns', commit)
     },
     fetchColumn ({ commit }, cid) {
-      return getAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
+      return asyncAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
     },
     fetchPosts ({ commit }, cid) {
-      return getAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
+      return asyncAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
     },
     fetchPost ({ commit }, pid) {
-      return getAndCommit(`/posts/${pid}`, 'fetchPost', commit)
+      return asyncAndCommit(`/posts/${pid}`, 'fetchPost', commit)
     },
     updatePost ({ commit }, { pid, payload }) {
       return asyncAndCommit(`/posts/${pid}`, 'updatePost', commit, {
@@ -149,10 +142,13 @@ const store = createStore<GlobalDataProps>({
       })
     },
     login ({ commit }, payload) {
-      return postAndCommit('/user/login', 'login', commit, payload)
+      return asyncAndCommit('/user/login', 'login', commit, {
+        method: 'post',
+        data: payload
+      })
     },
     fetchCurrentUser ({ commit }) {
-      return getAndCommit('/user/current', 'fetchCurrentUser', commit)
+      return asyncAndCommit('/user/current', 'fetchCurrentUser', commit)
     },
     loginAndFetch ({ dispatch }, loginData) {
       return dispatch('login', loginData).then(() => {
@@ -160,7 +156,13 @@ const store = createStore<GlobalDataProps>({
       })
     },
     createPost ({ commit }, payload) {
-      return postAndCommit('/posts', 'createPost', commit, payload)
+      return asyncAndCommit('/posts', 'createPost', commit, {
+        method: 'post',
+        data: payload
+      })
+    },
+    deletePost ({ commit }, pid) {
+      return asyncAndCommit(`/posts/${pid}`, 'deletePost', commit, { method: 'delete' })
     }
   },
   getters: {
