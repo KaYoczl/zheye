@@ -1,5 +1,5 @@
 import { Commit, createStore } from 'vuex'
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 
 export interface ResponseType<P = { [key: string]: any }> {
   code: number
@@ -63,6 +63,13 @@ const postAndCommit = async (url: string, mutationName: string, commit: Commit, 
   commit(mutationName, data)
   return data
 }
+// 第3个参数是传入axios发送请求时的配置，它有一个独特的类型
+const asyncAndCommit = async (url: string, mutationName: string, commit: Commit, config: AxiosRequestConfig = { method: 'get' }) => {
+  // 不是直接使用get等方法，而是把axios当方法使用，第一个参数是url，第二个是config
+  const { data } = await axios(url, config)
+  commit(mutationName, data)
+  return data
+}
 const store = createStore<GlobalDataProps>({
   state: {
     token: localStorage.getItem('token') || '',
@@ -90,6 +97,16 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPost (state, rawData) {
       state.posts = [rawData.data]
+    },
+    updatePost (state, { data }) {
+      // 如果id相同说明改动的文章确实是当前页面对应的文章，如果返回的id并不是当前页面的，posts就继续使用当前页面的文章数据，暂时没发现有什么意义
+      state.posts.map(post => {
+        if (post._id === data._id) {
+          return data
+        } else {
+          return post
+        }
+      })
     },
     setLoading (state, status) {
       state.loading = status
@@ -124,6 +141,12 @@ const store = createStore<GlobalDataProps>({
     },
     fetchPost ({ commit }, pid) {
       return getAndCommit(`/posts/${pid}`, 'fetchPost', commit)
+    },
+    updatePost ({ commit }, { pid, payload }) {
+      return asyncAndCommit(`/posts/${pid}`, 'updatePost', commit, {
+        method: 'patch',
+        data: payload
+      })
     },
     login ({ commit }, payload) {
       return postAndCommit('/user/login', 'login', commit, payload)
