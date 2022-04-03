@@ -1,5 +1,6 @@
 import { Commit, createStore } from 'vuex'
 import axios, { AxiosRequestConfig } from 'axios'
+import { arrToObj, objToArr } from './helper'
 
 export interface ResponseType<P = { [key: string]: any }> {
   code: number
@@ -41,14 +42,17 @@ export interface PostProps {
   column: string
   author?: UserProps | string
 }
+interface ListProps<P> {
+  [id: string]: P
+}
 export interface GlobalErrorProps {
   status: boolean
   message?: string
 }
 export interface GlobalDataProps {
   token: string
-  columns: ColumnProps[]
-  posts: PostProps[]
+  columns: ListProps<ColumnProps>
+  posts: ListProps<PostProps>
   user: UserProps
   loading: boolean
   error: GlobalErrorProps
@@ -63,43 +67,33 @@ const asyncAndCommit = async (url: string, mutationName: string, commit: Commit,
 const store = createStore<GlobalDataProps>({
   state: {
     token: localStorage.getItem('token') || '',
-    columns: [],
-    posts: [],
+    columns: {},
+    posts: {},
     user: { isLogin: false },
     loading: false,
     error: { status: false }
   },
   mutations: {
-    // login (state) {
-    //   state.user = { ...state.user, isLogin: true, name: 'lvxiaobu' }
-    // },
     createPost (state, newPost) {
-      state.posts.push(newPost)
+      state.posts[newPost._id] = newPost
     },
     deletePost (state, { data }) {
-      state.posts = state.posts.filter(post => post._id !== data._id)
+      delete state.posts[data._id]
     },
     fetchColumns (state, rawData) {
-      state.columns = rawData.data.list
+      state.columns = arrToObj(rawData.data.list)
     },
     fetchColumn (state, rawData) {
-      state.columns = [rawData.data]
+      state.columns[rawData.data._id] = rawData.data
     },
     fetchPosts (state, rawData) {
-      state.posts = rawData.data.list
+      state.posts = arrToObj(rawData.data.list)
     },
     fetchPost (state, rawData) {
-      state.posts = [rawData.data]
+      state.posts[rawData.data._id] = rawData.data
     },
     updatePost (state, { data }) {
-      // 如果id相同说明改动的文章确实是当前页面对应的文章，如果返回的id并不是当前页面的，posts就继续使用当前页面的文章数据，暂时没发现有什么意义
-      state.posts.map(post => {
-        if (post._id === data._id) {
-          return data
-        } else {
-          return post
-        }
-      })
+      state.posts[data._id] = data
     },
     setLoading (state, status) {
       state.loading = status
@@ -166,14 +160,17 @@ const store = createStore<GlobalDataProps>({
     }
   },
   getters: {
+    getColumns: (state) => {
+      return objToArr(state.columns)
+    },
     getColumnById: (state) => (id: string) => {
-      return state.columns.find(c => c._id === id)
+      return state.columns[id]
     },
     getPostsByCid: (state) => (cid: string) => {
-      return state.posts.filter(post => post.column === cid)
+      return objToArr(state.posts).filter(post => post.column === cid)
     },
     getPostByPid: (state) => (pid: string) => {
-      return state.posts.find(post => post._id === pid)
+      return state.posts[pid]
     }
   }
 })
