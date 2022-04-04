@@ -15,7 +15,6 @@
         <img :src="dataProps.uploadedData.data.url" width="500">
       </template>
     </uploader>
-    <h2>{{titleVal}}</h2>
     <validate-form @form-submit="onFormSubmit">
       <div class="mb-3">
         <label class="form-label">文章标题：</label>

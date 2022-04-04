@@ -145,8 +145,12 @@ const store = createStore<GlobalDataProps>({
       }
     },
     fetchPost ({ state, commit }, pid) {
-      if (!state.posts.data[pid]) {
+      const currentPost = state.posts.data[pid]
+      if (!currentPost || !currentPost.content) {
         return asyncAndCommit(`/posts/${pid}`, 'fetchPost', commit)
+      } else {
+        // 如果不返回一个Promise，那么在编辑文章页就因为不执行上面代码导致.then回调函数中的rawData为undefined
+        return Promise.resolve({ data: currentPost })
       }
     },
     updatePost ({ commit }, { pid, payload }) {
