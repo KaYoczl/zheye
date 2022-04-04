@@ -51,49 +51,61 @@ export interface GlobalErrorProps {
 }
 export interface GlobalDataProps {
   token: string
-  columns: ListProps<ColumnProps>
-  posts: ListProps<PostProps>
+  columns: { data: ListProps<ColumnProps>, isLoaded: boolean }
+  posts: { data: ListProps<PostProps>, loadedColumns: string[] }
   user: UserProps
   loading: boolean
   error: GlobalErrorProps
 }
 // 第4个参数是传入axios发送请求时的配置，它有一个独特的类型
-const asyncAndCommit = async (url: string, mutationName: string, commit: Commit, config: AxiosRequestConfig = { method: 'get' }) => {
+const asyncAndCommit = async (
+  url: string,
+  mutationName: string,
+  commit: Commit,
+  config: AxiosRequestConfig = { method: 'get' },
+  extraData?: any
+) => {
   // 不是直接使用get等方法，而是把axios当方法使用，第一个参数是url，第二个是config
   const { data } = await axios(url, config)
-  commit(mutationName, data)
+  if (extraData) {
+    commit(mutationName, { data, extraData })
+  } else {
+    commit(mutationName, data)
+  }
   return data
 }
 const store = createStore<GlobalDataProps>({
   state: {
     token: localStorage.getItem('token') || '',
-    columns: {},
-    posts: {},
+    columns: { data: {}, isLoaded: false },
+    posts: { data: {}, loadedColumns: [] },
     user: { isLogin: false },
     loading: false,
     error: { status: false }
   },
   mutations: {
     createPost (state, newPost) {
-      state.posts[newPost._id] = newPost
+      state.posts.data[newPost._id] = newPost
     },
     deletePost (state, { data }) {
-      delete state.posts[data._id]
+      delete state.posts.data[data._id]
     },
     fetchColumns (state, rawData) {
-      state.columns = arrToObj(rawData.data.list)
+      state.columns.data = arrToObj(rawData.data.list)
+      state.columns.isLoaded = true
     },
     fetchColumn (state, rawData) {
-      state.columns[rawData.data._id] = rawData.data
+      state.columns.data[rawData.data._id] = rawData.data
     },
-    fetchPosts (state, rawData) {
-      state.posts = arrToObj(rawData.data.list)
+    fetchPosts (state, { data: rawData, extraData: columnId }) {
+      state.posts.data = { ...state.posts.data, ...arrToObj(rawData.data.list) }
+      state.posts.loadedColumns.push(columnId)
     },
     fetchPost (state, rawData) {
-      state.posts[rawData.data._id] = rawData.data
+      state.posts.data[rawData.data._id] = rawData.data
     },
     updatePost (state, { data }) {
-      state.posts[data._id] = data
+      state.posts.data[data._id] = data
     },
     setLoading (state, status) {
       state.loading = status
@@ -117,17 +129,25 @@ const store = createStore<GlobalDataProps>({
     }
   },
   actions: {
-    fetchColumns ({ commit }) {
-      return asyncAndCommit('/columns', 'fetchColumns', commit)
+    fetchColumns ({ state, commit }) {
+      if (!state.columns.isLoaded) {
+        return asyncAndCommit('/columns', 'fetchColumns', commit)
+      }
     },
-    fetchColumn ({ commit }, cid) {
-      return asyncAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
+    fetchColumn ({ state, commit }, cid) {
+      if (!state.columns.data[cid]) {
+        return asyncAndCommit(`/columns/${cid}`, 'fetchColumn', commit)
+      }
     },
-    fetchPosts ({ commit }, cid) {
-      return asyncAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit)
+    fetchPosts ({ state, commit }, cid) {
+      if (!state.posts.loadedColumns.includes(cid)) {
+        return asyncAndCommit(`/columns/${cid}/posts`, 'fetchPosts', commit, { method: 'get' }, cid)
+      }
     },
-    fetchPost ({ commit }, pid) {
-      return asyncAndCommit(`/posts/${pid}`, 'fetchPost', commit)
+    fetchPost ({ state, commit }, pid) {
+      if (!state.posts.data[pid]) {
+        return asyncAndCommit(`/posts/${pid}`, 'fetchPost', commit)
+      }
     },
     updatePost ({ commit }, { pid, payload }) {
       return asyncAndCommit(`/posts/${pid}`, 'updatePost', commit, {
@@ -161,16 +181,16 @@ const store = createStore<GlobalDataProps>({
   },
   getters: {
     getColumns: (state) => {
-      return objToArr(state.columns)
+      return objToArr(state.columns.data)
     },
     getColumnById: (state) => (id: string) => {
-      return state.columns[id]
+      return state.columns.data[id]
     },
     getPostsByCid: (state) => (cid: string) => {
-      return objToArr(state.posts).filter(post => post.column === cid)
+      return objToArr(state.posts.data).filter(post => post.column === cid)
     },
     getPostByPid: (state) => (pid: string) => {
-      return state.posts[pid]
+      return state.posts.data[pid]
     }
   }
 })
