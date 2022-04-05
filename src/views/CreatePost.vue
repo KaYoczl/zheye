@@ -67,7 +67,6 @@ export default defineComponent({
     const router = useRouter()
     const route = useRoute()
     const isEditMode = !!route.query.id
-    console.log(isEditMode)
     const store = useStore<GlobalDataProps>()
     let imageId = ''
     const titleRules: RulesProp = [

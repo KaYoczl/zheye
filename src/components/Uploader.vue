@@ -39,7 +39,6 @@ export default defineComponent({
     const fileInput = ref<null | HTMLInputElement>(null)
     const fileStatus = ref<UploadStatus>(props.uploaded ? 'success' : 'ready')
     const uploadedData = ref(props.uploaded)
-    console.log(props.uploaded)
     watch(() => props.uploaded, (newValue) => {
       if (newValue) {
         fileStatus.value = 'success'

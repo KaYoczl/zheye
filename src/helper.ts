@@ -45,7 +45,7 @@ export const arrToObj = <T extends { _id?: string }>(arr: Array<T>) => {
   }, {} as { [key: string]: T })
 }
 const result1 = arrToObj(testData1)
-console.log(result1)
+// console.log(result1)
 // { 1: { _id: '1', name: 'a' }, 2: { _id: '2', name: 'b' } }
 
 export const objToArr = <T>(obj: {[key: string]: T}) => {
@@ -56,5 +56,5 @@ const testData2: {[key: string]: TestProps} = {
   2: { _id: '2', name: 'b' }
 }
 const result2 = objToArr(testData2)
-console.log(result2)
+// console.log(result2)
 // [{ _id: '1', name: 'a' }, { _id: '2', name: 'b' }]
