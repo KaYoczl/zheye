@@ -8,7 +8,7 @@ interface LoadParams {
 const useLoadMore = (
   actionName: string,
   total: ComputedRef<number>,
-  params: LoadParams = { currentPage: 2, pageSize: 5 }
+  params: LoadParams = { currentPage: 2, pageSize: 6 }
 ) => {
   const store = useStore()
   const currentPage = ref(params.currentPage)
