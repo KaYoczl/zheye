@@ -149,6 +149,9 @@ export default defineComponent({
 })
 </script>
 <style>
+.create-post-page {
+  margin-bottom: 20px;
+}
 .create-post-page .file-upload-container {
   height: 200px;
   cursor: pointer;

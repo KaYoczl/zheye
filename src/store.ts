@@ -122,6 +122,7 @@ const store = createStore<GlobalDataProps>({
       axios.defaults.headers.common.Authorization = `Bearer ${token}`
     },
     logout (state) {
+      state.user = { isLogin: false }
       state.token = ''
       localStorage.removeItem('token')
       delete axios.defaults.headers.common.Authorization

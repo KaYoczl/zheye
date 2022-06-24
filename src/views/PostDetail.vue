@@ -11,7 +11,7 @@
       <img :src="currentImageUrl" v-if="currentImageUrl" width="500">
     </div>
     <hr>
-    <user-profile :author="currentPost.author" v-if="typeof currentPost.author !== 'string'"></user-profile>
+    <user-profile :author="currentPost.author" v-if="typeof currentPost.author === 'object'"></user-profile>
     <hr>
     <div class="content" v-html="currentHTML"></div>
     <div v-if="showEditArea" class="btn-group mt-5">
@@ -88,6 +88,9 @@ export default defineComponent({
 })
 </script>
 <style scoped>
+.container {
+  margin-bottom: 20px;
+}
 .image {
   width: 100%;
   height: 100%;

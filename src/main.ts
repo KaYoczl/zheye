@@ -7,12 +7,12 @@ import App from './App.vue'
 axios.defaults.baseURL = 'http://apis.imooc.com/api/'
 axios.interceptors.request.use(config => {
   // get请求，添加到url中
-  config.params = { ...config.params, icode: 'B83FA1594D8BFE8D' }
+  config.params = { ...config.params, icode: '7010DEF1C581452E' }
   if (config.data instanceof FormData) {
-    config.data.append('icode', 'B83FA1594D8BFE8D')
+    config.data.append('icode', '7010DEF1C581452E')
   } else {
     // 普通的body对象，添加到data中
-    config.data = { ...config.data, icode: 'B83FA1594D8BFE8D' }
+    config.data = { ...config.data, icode: '7010DEF1C581452E' }
   }
   return config
 })
